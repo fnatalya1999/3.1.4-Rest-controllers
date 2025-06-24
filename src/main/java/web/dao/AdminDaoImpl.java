@@ -1,16 +1,16 @@
-package src.main.java.web.dao;
+package web.dao;
 
 
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.springframework.stereotype.Repository;
-import src.main.java.web.model.User;
+import web.model.User;
 
 import java.util.List;
 import java.util.Optional;
 
 @Repository
-public class UserDaoImpl implements UserDao {
+public class AdminDaoImpl implements AdminDao {
 
     @PersistenceContext
     private EntityManager entityManager;

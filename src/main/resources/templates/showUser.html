@@ -23,12 +23,12 @@
             <td th:text="${user.getAge()}">VALUE</td>
             <td th:text="${user.getEmail()}">VALUE</td>
             <td th:text="${user.getPassword()}">VALUE</td>
-            <td th:text="${user.getRole()}">VALUE</td>
+            <td th:text="${user.getRoles()}">VALUE</td>
         </tr>
     </table>
 </div>
-<a th:href="@{/users/{id}/edit(id=${user.getId()})}">Edit user!</a>
-<form th:method="DELETE" th:action="@{/users/{id}(id=${user.getId()})}">
+<a th:href="@{/admin/{id}/edit(id=${user.getId()})}">Edit user!</a>
+<form th:method="DELETE" th:action="@{/admin/{id}(id=${user.getId()})}">
     <input type="submit" value="Delete user"/>
 </form>
 </body>

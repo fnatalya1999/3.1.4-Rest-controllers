@@ -21,16 +21,21 @@
         <tr th:each="users : ${listOfUsers}">
 
             <td th:text="${users.getId()}">VALUE</td>
-            <td><a th:href="@{/users/{id}(id=${users.getId()})}" th:text="${users.getName()}">VALUE</a></td>
+            <td><a th:href="@{/admin/{id}(id=${users.getId()})}" th:text="${users.getName()}">VALUE</a></td>
             <td th:text="${users.getLastName()}">VALUE</td>
             <td th:text="${users.getAge()}">VALUE</td>
             <td th:text="${users.getEmail()}">VALUE</td>
             <td th:text="${users.getPassword()}">VALUE</td>
-            <td th:text="${users.getRole()}">VALUE</td>
+            <td>
+                <span th:each="role : ${users.roles}" th:text="${role.name} + ' '" />
+            </td>
+
+
 
         </tr>
     </table>
 </div>
-<a th:href="@{/users/new}">Create new user!</a>
+<a th:href="@{/admin/new}">Create new user!</a>
+<a th:href="@{/logout}">Выйти</a>
 </body>
 </html>

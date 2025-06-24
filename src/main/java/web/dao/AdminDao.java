@@ -1,11 +1,11 @@
-package src.main.java.web.service;
+package web.dao;
 
-import src.main.java.web.model.User;
+import web.model.User;
 
 import java.util.List;
 import java.util.Optional;
 
-public interface UserService {
+public interface AdminDao {
     void save(User user);
     List<User> findAll();
     Optional<User> findById(Long id);

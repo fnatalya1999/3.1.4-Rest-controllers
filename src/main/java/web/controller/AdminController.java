@@ -1,69 +1,63 @@
-package src.main.java.web.controller;
-
-
+package web.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import src.main.java.web.model.User;
-import src.main.java.web.service.UserService;
-
+import web.model.User;
+import web.service.AdminService;
+import web.service.RoleService;
 
 @Controller
-@RequestMapping("/users")
-public class UserController {
-    private final UserService userService;
+@RequestMapping("/admin")
+public class AdminController {
+
+    private final AdminService adminService;
+    private final RoleService roleService;
+
 
     @Autowired
-    public UserController(UserService userService) {
-        this.userService = userService;
+    public AdminController(AdminService adminService, RoleService roleService) {
+        this.adminService = adminService;
+        this.roleService = roleService;
     }
 
     @GetMapping("")
     public String allUsers(Model model) {
-        model.addAttribute("listOfUsers", userService.findAll());
+        model.addAttribute("listOfUsers", adminService.findAll());
         return "users";
     }
 
     @GetMapping("/new")
     public String createUserForm(Model model) {
         model.addAttribute("user", new User());
+        model.addAttribute("allRoles", roleService.findAll());
         return "new";
     }
 
     @GetMapping("/{id}")
     public String editUserForm(@PathVariable Long id, Model model) {
-        User user = userService.findById(id)
+        User user = adminService.findById(id)
                 .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
         model.addAttribute("user", user);
-        return "showUser";
+        model.addAttribute("allRoles", roleService.findAll());
+        return "edit";
     }
 
     @PostMapping()
     public String addUser(@ModelAttribute("user") User user) {
-        userService.save(user);
-        return "redirect:/users";
-    }
-
-    @GetMapping("/{id}/edit")
-    public String updateUserForm(@PathVariable Long id, Model model) {
-        User user = userService.findById(id)
-                .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
-        model.addAttribute("user", user);
-        return "edit";
+        adminService.save(user);
+        return "redirect:/admin";
     }
 
     @PatchMapping("/{id}")
     public String updateUser(@ModelAttribute("user") User user, @PathVariable Long id) {
-        userService.updateUser(user);
-        return "redirect:/users";
+        adminService.updateUser(user);
+        return "redirect:/admin";
     }
 
     @DeleteMapping("/{id}")
     public String deleteUser(@PathVariable Long id) {
-        userService.deleteById(id);
-        return "redirect:/users";
+        adminService.deleteById(id);
+        return "redirect:/admin";
     }
 }
-
-

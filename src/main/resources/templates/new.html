@@ -5,7 +5,7 @@
     <title>New User</title>
 </head>
 <body>
-<form th:method="POST" th:action="@{/users}" th:object="${user}">
+<form th:method="POST" th:action="@{/admin}" th:object="${user}">
     <label for="name">Name</label>
     <input name="name" type="text" id="name"/>
 
@@ -31,8 +31,13 @@
 
     <br/>
 
-    <label for="role">Role</label>
-    <input name="role" type="text" id="role"/>
+    <label for="roles">Roles</label>
+    <select multiple id="roles" th:field="*{roles}">
+        <option th:each="role : ${allRoles}"
+                th:value="${role.id}"
+                th:text="${role.name}">
+        </option>
+    </select>
 
     <br/>
 

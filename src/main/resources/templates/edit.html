@@ -5,7 +5,7 @@
     <title>Edit profile</title>
 </head>
 <body>
-<form th:method="PATCH" th:action="@{/users/{id}(id=${user.getId()})}" th:object="${user}">
+<form th:method="PATCH" th:action="@{/admin/{id}(id=${user.getId()})}" th:object="${user}">
     <label for="name">Name</label>
     <input type="text" th:field="*{name}" id="name"/>
 
@@ -31,15 +31,24 @@
 
     <br>
 
-    <label for="role">Role</label>
-    <input type="text" th:field="*{role}" id="role"/>
+    <label for="roles">Roles</label>
+    <select multiple id="roles" th:field="*{roles}">
+        <option th:each="role : ${allRoles}"
+                th:value="${role.id}"
+                th:text="${role.name}">
+        </option>
+    </select>
+
 
     <br>
 
     <input type="submit" value="Update!"/>
 
 </form>
-<a th:href="@{/users}">Delete user!</a>
+<form th:action="@{/admin/{id}(id=${user.id})}" method="post">
+    <input type="hidden" name="_method" value="delete"/>
+    <input type="submit" value="Delete user!"/>
+</form>
 
 </body>
 </html>
