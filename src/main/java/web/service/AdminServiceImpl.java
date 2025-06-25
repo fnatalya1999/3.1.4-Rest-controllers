@@ -17,7 +17,6 @@ public class AdminServiceImpl implements AdminService {
     private final AdminDao adminDao;
     private final PasswordEncoder passwordEncoder;
 
-    @Autowired
     public AdminServiceImpl(AdminDao adminDao, PasswordEncoder passwordEncoder) {
         this.adminDao = adminDao;
         this.passwordEncoder = passwordEncoder;
