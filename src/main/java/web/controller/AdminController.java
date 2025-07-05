@@ -1,11 +1,17 @@
 package web.controller;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import web.dto.UserDto;
+import web.model.Role;
 import web.model.User;
 import web.service.AdminService;
 import web.service.RoleService;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/admin")
@@ -22,9 +28,14 @@ public class AdminController {
     }
 
     @GetMapping("")
-    public String allUsers(Model model) {
-        model.addAttribute("listOfUsers", adminService.findAll());
+    public String allUsers() {
         return "users";
+    }
+
+    @GetMapping("/data")
+    @ResponseBody
+    public List<UserDto> getAllUsers() {
+        return adminService.findAll().stream().map(UserDto::new).collect(Collectors.toList());
     }
 
     @GetMapping("/new")
@@ -43,11 +54,43 @@ public class AdminController {
         return "edit";
     }
 
+    @GetMapping("/data/{id}")
+    @ResponseBody
+    public UserDto getUserById(@PathVariable Long id) {
+        User user = adminService.findById(id)
+                .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
+        return new UserDto(user);
+    }
+
+
     @PostMapping()
     public String addUser(@ModelAttribute("user") User user) {
         adminService.save(user);
         return "redirect:/admin";
     }
+
+    @PostMapping(consumes = "application/json")
+    @ResponseBody
+    public ResponseEntity<?> addUserJson(@RequestBody User user) {
+        adminService.save(user);
+        return ResponseEntity.ok().build();
+    }
+
+    @PatchMapping(value = "/{id}", consumes = "application/json")
+    @ResponseBody
+    public ResponseEntity<?> updateUserJson(@RequestBody User user, @PathVariable Long id) {
+        user.setId(id);
+        adminService.updateUser(user);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/{id}")
+    @ResponseBody
+    public ResponseEntity<?> deleteUserJson(@PathVariable Long id) {
+        adminService.deleteById(id);
+        return ResponseEntity.ok().build();
+    }
+
 
     @PatchMapping("/{id}")
     public String updateUser(@ModelAttribute("user") User user, @PathVariable Long id) {
@@ -55,9 +98,11 @@ public class AdminController {
         return "redirect:/admin";
     }
 
-    @DeleteMapping("/{id}")
-    public String deleteUser(@PathVariable Long id) {
-        adminService.deleteById(id);
-        return "redirect:/admin";
+
+
+    @GetMapping("/roles")
+    @ResponseBody
+    public List<Role> getAllRoles() {
+        return roleService.findAll();
     }
 }

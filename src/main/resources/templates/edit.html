@@ -1,58 +1,112 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8"/>
     <title>Edit Profile</title>
-
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
 </head>
 <body class="container mt-5">
 
 <h2>Edit Profile</h2>
 
-<form th:method="PATCH" th:action="@{/admin/{id}(id=${user.getId()})}" th:object="${user}" class="mb-4">
+<form id="editUserForm" class="mb-4">
+    <input type="hidden" id="userId" th:value="${user.id}"/>
     <div class="mb-3">
         <label for="name" class="form-label">Name</label>
-        <input type="text" th:field="*{name}" id="name" class="form-control"/>
+        <input type="text" id="name" class="form-control" th:value="${user.name}" required/>
     </div>
 
     <div class="mb-3">
         <label for="lastName" class="form-label">Last Name</label>
-        <input type="text" th:field="*{lastName}" id="lastName" class="form-control"/>
+        <input type="text" id="lastName" class="form-control" th:value="${user.lastName}" required/>
     </div>
 
     <div class="mb-3">
         <label for="age" class="form-label">Age</label>
-        <input type="text" th:field="*{age}" id="age" class="form-control"/>
+        <input type="number" id="age" class="form-control" th:value="${user.age}" required/>
     </div>
 
     <div class="mb-3">
         <label for="email" class="form-label">Email</label>
-        <input type="email" th:field="*{email}" id="email" class="form-control"/>
+        <input type="email" id="email" class="form-control" th:value="${user.email}" required/>
     </div>
 
     <div class="mb-3">
         <label for="password" class="form-label">Password</label>
-        <input type="password" th:field="*{password}" id="password" class="form-control"/>
+        <input type="password" id="password" class="form-control"/>
     </div>
 
     <div class="mb-3">
         <label for="roles" class="form-label">Roles</label>
-        <select multiple id="roles" th:field="*{roles}" class="form-select">
+        <select multiple id="roles" class="form-select" required>
             <option th:each="role : ${allRoles}"
                     th:value="${role.id}"
-                    th:text="${role.name}">
-            </option>
+                    th:text="${role.name}"
+                    th:selected="${user.roles.contains(role)}"></option>
         </select>
     </div>
 
     <button type="submit" class="btn btn-primary">Update</button>
+    <button type="button" id="deleteUserBtn" class="btn btn-danger">Delete User</button>
 </form>
 
-<form th:action="@{/admin/{id}(id=${user.id})}" method="post">
-    <input type="hidden" name="_method" value="delete"/>
-    <button type="submit" class="btn btn-danger">Delete User</button>
-</form>
+<script>
+    const csrfToken = document.querySelector('meta[name="_csrf"]').content;
+    const csrfHeader = document.querySelector('meta[name="_csrf_header"]').content;
+
+    document.getElementById('editUserForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const id = document.getElementById('userId').value;
+        const name = document.getElementById('name').value;
+        const lastName = document.getElementById('lastName').value;
+        const age = Number(document.getElementById('age').value);
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+        const selectedRoles = Array.from(document.getElementById('roles').selectedOptions)
+            .map(option => ({id: Number(option.value)}));
+
+        let userData = {id, name, lastName, age, email, roles: selectedRoles};
+        if (password.trim() !== '') {
+            userData.password = password;
+        }
+
+        const res = await fetch(`/admin/${id}`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+                [csrfHeader]: csrfToken
+            },
+            body: JSON.stringify(userData)
+        });
+
+        if (res.ok) {
+            alert('User updated successfully!');
+        } else {
+            alert('Error updating user');
+        }
+    });
+
+    document.getElementById('deleteUserBtn').addEventListener('click', async () => {
+        const id = document.getElementById('userId').value;
+        if (confirm('Are you sure you want to delete this user?')) {
+            const res = await fetch(`/admin/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    [csrfHeader]: csrfToken
+                }
+            });
+            if (res.ok) {
+                alert('User deleted');
+                window.location.href = '/admin'; // возврат к списку
+            } else {
+                alert('Error deleting user');
+            }
+        }
+    });
+</script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
