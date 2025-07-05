@@ -1,7 +1,6 @@
 package web.service;
 
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,19 +32,19 @@ public class AdminServiceImpl implements AdminService {
     }
 
     @Override
-    public List<User> findAll() {
-        return adminDao.findAll();
+    public List<User> findAllUser() {
+        return adminDao.findAllUser();
     }
 
     @Override
     public Optional<User> findById(Long id) {
-        return adminDao.findById(id);
+        return adminDao.findByIdUser(id);
     }
 
     @Override
     @Transactional
     public void updateUser(User user) {
-        Optional<User> existingUser = adminDao.findById(user.getId());
+        Optional<User> existingUser = adminDao.findByIdUser(user.getId());
         if (existingUser.isPresent()) {
             User userFromDb = existingUser.get();
             if (user.getPassword() == null || user.getPassword().isEmpty()) {

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
@@ -13,8 +13,8 @@
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h2>Список пользователей</h2>
     <div>
-        <a th:href="@{/admin/new}" class="btn btn-success me-2">Создать пользователя</a>
-        <a th:href="@{/logout}" class="btn btn-outline-danger">Выйти</a>
+        <a href="/admin/new" class="btn btn-success me-2">Создать пользователя</a>
+        <a href="/logout" class="btn btn-outline-danger">Выйти</a>
     </div>
 </div>
 
@@ -29,25 +29,75 @@
         <th>Роли</th>
     </tr>
     </thead>
-    <tbody>
-    <tr th:each="user : ${listOfUsers}">
-        <td th:text="${user.id}">1</td>
-        <td>
-            <a th:href="@{/admin/{id}(id=${user.id})}" th:text="${user.name}" class="text-decoration-none">Имя</a>
-        </td>
-        <td th:text="${user.lastName}">Фамилия</td>
-        <td th:text="${user.age}">Возраст</td>
-        <td th:text="${user.email}">Email</td>
-        <td>
-                <span th:each="role : ${user.roles}"
-                      th:text="${role.name}"
-                      class="badge bg-secondary me-1">
-                </span>
-        </td>
-    </tr>
+    <tbody id="usersTbody">
     </tbody>
 </table>
 
+<script>
+    async function loadUsers() {
+        try {
+            const response = await fetch('/admin/data');
+            if (!response.ok) throw new Error(`Ошибка сети: ${response.status}`);
+
+            const users = await response.json();
+
+            const tbody = document.getElementById('usersTbody');
+            tbody.innerHTML = '';
+
+            users.forEach(user => {
+                const tr = document.createElement('tr');
+
+                // ID
+                const tdId = document.createElement('td');
+                tdId.textContent = user.id;
+                tr.appendChild(tdId);
+
+                // Имя с ссылкой
+                const tdName = document.createElement('td');
+                const aName = document.createElement('a');
+                aName.href = `/admin/${user.id}`;
+                aName.textContent = user.name;
+                aName.className = 'text-decoration-none';
+                tdName.appendChild(aName);
+                tr.appendChild(tdName);
+
+                // Фамилия
+                const tdLastName = document.createElement('td');
+                tdLastName.textContent = user.lastName;
+                tr.appendChild(tdLastName);
+
+                // Возраст
+                const tdAge = document.createElement('td');
+                tdAge.textContent = user.age;
+                tr.appendChild(tdAge);
+
+                // Email
+                const tdEmail = document.createElement('td');
+                tdEmail.textContent = user.email;
+                tr.appendChild(tdEmail);
+
+                // Роли
+                const tdRoles = document.createElement('td');
+                if (user.roles && user.roles.length > 0) {
+                    user.roles.forEach(role => {
+                        const span = document.createElement('span');
+                        span.className = 'badge bg-secondary me-1';
+                        span.textContent = role.name;
+                        tdRoles.appendChild(span);
+                    });
+                }
+                tr.appendChild(tdRoles);
+
+                tbody.appendChild(tr);
+            });
+        } catch (error) {
+            console.error('Ошибка загрузки пользователей:', error);
+            alert('Не удалось загрузить список пользователей');
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', loadUsers);
+</script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>

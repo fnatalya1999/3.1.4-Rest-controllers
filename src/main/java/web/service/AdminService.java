@@ -7,7 +7,7 @@ import java.util.Optional;
 
 public interface AdminService {
     void save(User user);
-    List<User> findAll();
+    List<User> findAllUser();
     Optional<User> findById(Long id);
     void updateUser(User user);
     void deleteById(Long id);

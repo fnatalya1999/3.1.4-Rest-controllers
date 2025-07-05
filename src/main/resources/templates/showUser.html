@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>User Info</title>
@@ -21,28 +21,88 @@
         <th>Роли</th>
     </tr>
     </thead>
-    <tbody>
-    <tr>
-        <td th:text="${user.id}">ID</td>
-        <td th:text="${user.name}">Name</td>
-        <td th:text="${user.lastName}">Last Name</td>
-        <td th:text="${user.age}">Age</td>
-        <td th:text="${user.email}">Email</td>
-        <td>
-            <span th:each="role : ${user.roles}" th:text="${role.name}" class="badge bg-secondary me-1">Role</span>
-        </td>
-    </tr>
+    <tbody id="userTbody">
     </tbody>
 </table>
 
-<div class="d-flex gap-2">
-    <a class="btn btn-warning" th:href="@{/admin/{id}/edit(id=${user.id})}">Редактировать</a>
+<div class="d-flex gap-2 mb-4">
+    <a id="editBtn" class="btn btn-warning" href="#">Редактировать</a>
 
-    <form th:method="DELETE" th:action="@{/admin/{id}(id=${user.id})}">
+    <form id="deleteForm" method="POST" onsubmit="return confirm('Удалить пользователя?');">
+        <input type="hidden" name="_method" value="delete">
         <button type="submit" class="btn btn-danger">Удалить</button>
     </form>
 </div>
 
+<script>
+    async function loadUser() {
+        const userId = window.location.pathname.split('/').pop();
+
+        try {
+            const response = await fetch(`/admin/data/${userId}`);
+            if (!response.ok) throw new Error(`Ошибка сети: ${response.status}`);
+
+            const user = await response.json();
+
+            const tbody = document.getElementById('userTbody');
+            tbody.innerHTML = '';
+
+            const tr = document.createElement('tr');
+
+            // ID
+            let td = document.createElement('td');
+            td.textContent = user.id;
+            tr.appendChild(td);
+
+            // Имя
+            td = document.createElement('td');
+            td.textContent = user.name;
+            tr.appendChild(td);
+
+            // Фамилия
+            td = document.createElement('td');
+            td.textContent = user.lastName;
+            tr.appendChild(td);
+
+            // Возраст
+            td = document.createElement('td');
+            td.textContent = user.age;
+            tr.appendChild(td);
+
+            // Email
+            td = document.createElement('td');
+            td.textContent = user.email;
+            tr.appendChild(td);
+
+            // Роли
+            td = document.createElement('td');
+            if (user.roles && user.roles.length > 0) {
+                user.roles.forEach(role => {
+                    const span = document.createElement('span');
+                    span.className = 'badge bg-secondary me-1';
+                    span.textContent = role.name;
+                    td.appendChild(span);
+                });
+            }
+            tr.appendChild(td);
+
+            tbody.appendChild(tr);
+
+            const editBtn = document.getElementById('editBtn');
+            editBtn.href = `/admin/${user.id}/edit`;
+
+            const deleteForm = document.getElementById('deleteForm');
+            deleteForm.action = `/admin/${user.id}`;
+            deleteForm.method = 'post';
+
+        } catch (e) {
+            console.error('Ошибка загрузки пользователя:', e);
+            alert('Не удалось загрузить пользователя');
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', loadUser);
+</script>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
