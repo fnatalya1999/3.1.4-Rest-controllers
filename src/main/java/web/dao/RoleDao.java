@@ -8,5 +8,4 @@ import java.util.Optional;
 public interface RoleDao {
     List<Role> findAll();
     Optional<Role> findById(Long id);
-    Optional<Role> findByName(String name);
 }

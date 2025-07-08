@@ -23,14 +23,4 @@ public class RoleDaoImpl implements RoleDao {
     public Optional<Role> findById(Long id) {
         return Optional.ofNullable(entityManager.find(Role.class, id));
     }
-
-    @Override
-    public Optional<Role> findByName(String name) {
-        List<Role> roles = entityManager.createQuery(
-                        "SELECT r FROM Role r WHERE r.name = :name", Role.class)
-                .setParameter("name", name)
-                .getResultList();
-
-        return roles.stream().findFirst();
-    }
 }

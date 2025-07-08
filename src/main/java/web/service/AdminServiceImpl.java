@@ -4,7 +4,7 @@ package web.service;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import web.dao.AdminDao;
+import web.dao.UserDao;
 import web.model.User;
 
 import java.util.List;
@@ -13,11 +13,11 @@ import java.util.Optional;
 @Service
 public class AdminServiceImpl implements AdminService {
 
-    private final AdminDao adminDao;
+    private final UserDao userDao;
     private final PasswordEncoder passwordEncoder;
 
-    public AdminServiceImpl(AdminDao adminDao, PasswordEncoder passwordEncoder) {
-        this.adminDao = adminDao;
+    public AdminServiceImpl(UserDao userDao, PasswordEncoder passwordEncoder) {
+        this.userDao = userDao;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -28,23 +28,23 @@ public class AdminServiceImpl implements AdminService {
         if (user.getPassword() != null && !user.getPassword().isEmpty()) {
             user.setPassword(passwordEncoder.encode(user.getPassword()));
         }
-        adminDao.save(user);
+        userDao.save(user);
     }
 
     @Override
     public List<User> findAllUser() {
-        return adminDao.findAllUser();
+        return userDao.findAll();
     }
 
     @Override
     public Optional<User> findById(Long id) {
-        return adminDao.findByIdUser(id);
+        return userDao.findById(id);
     }
 
     @Override
     @Transactional
     public void updateUser(User user) {
-        Optional<User> existingUser = adminDao.findByIdUser(user.getId());
+        Optional<User> existingUser = userDao.findById(user.getId());
         if (existingUser.isPresent()) {
             User userFromDb = existingUser.get();
             if (user.getPassword() == null || user.getPassword().isEmpty()) {
@@ -52,13 +52,13 @@ public class AdminServiceImpl implements AdminService {
             } else if (!user.getPassword().equals(userFromDb.getPassword())) {
                 user.setPassword(passwordEncoder.encode(user.getPassword()));
             }
-            adminDao.updateUser(user);
+            userDao.update(user);
         }
     }
 
     @Override
     @Transactional
     public void deleteById(Long id) {
-        adminDao.deleteById(id);
+        userDao.deleteById(id);
     }
 }

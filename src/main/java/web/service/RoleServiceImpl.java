@@ -2,7 +2,7 @@ package web.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import web.dao.AdminDaoImpl;
+import web.dao.RoleDaoImpl;
 import web.model.Role;
 
 import java.util.List;
@@ -10,21 +10,21 @@ import java.util.List;
 @Service
 public class RoleServiceImpl implements RoleService {
 
-    private final AdminDaoImpl adminDao;
+    private final RoleDaoImpl roleDao;
 
     @Autowired
-    public RoleServiceImpl(AdminDaoImpl adminDao) {
-        this.adminDao = adminDao;
+    public RoleServiceImpl(RoleDaoImpl roleDao) {
+        this.roleDao = roleDao;
     }
 
     @Override
     public List<Role> findAllRole() {
-        return adminDao.findAllRole();
+        return roleDao.findAll();
     }
 
     @Override
     public Role findById(Long id) {
-        return adminDao.findByIdRole(id)
+        return roleDao.findById(id)
                 .orElseThrow(() -> new RuntimeException("Role not found with id: " + id));
     }
 }
